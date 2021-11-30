@@ -1,0 +1,30 @@
+使用方式：将Weibo Data和process_data.py放在同一路径下，直接调用process_data.py即可得到三个返回值，分别对应训练集，验证集（选用），测试集；并得到一些中间文件
+
+process_data返回的data_all_train格式如下：
+ ["uid", "month_1", "forward_count_month_1", "comment_count_month_1", "like_count_month_1", "keyword_weight_month_1","month_2", "forward_count_month_2", "comment_count_month_2", "like_count_month_2", "keyword_weight_month_2"……]
+ 用户id索引,月份_1   ，当月平均转发数       ，               当月平均评论数  ，          当月平均点赞数     ，   当月内容平均总权重，
+
+其中，用户id索引对应的uid需要通过data_prepare.py中的train_uid获取，如第i行对应的用户uid为train_uid[i]
+其他的返回值为 data_val_pd:验证集（DataFrame）,对应训练集所处月份后一个月的数据，可以通过前几个的数据以及该月数据进行训练和预测
+    data_test_pd：测试集（DataFrame）
+
+prepare_dataset.py思路：训练集中的数据跨度为6个月，且要通过这6个月的数据预测第7个月的数据，故可以考虑利用前几个月的数据来训练，通过后一个月的数据输入
+到模型中来验证模型的拟合效果；
+
+process_data(start_month=2, end_month=8)即为用于实现此项目地的方法，可以改变start_month和end_month的值，改变训练集的大小和时间跨度范围，默认状态下，
+取2月初~6月初的数据作为训练集，6月初到7月初的数据作为验证集；当取start_month=8时，验证集为空
+
+在数据预处理中，使用jieba库对每条微博的内容进行分词操作（去除其中的中文、英文、以及一些自定义的符号，该部分内容可在delete_punctuation(line)中的filters列表中
+进行添加和删减），统计权重最高的30个单词（权重计算方式为该条微博的所有单词×（转发数+点赞数+评论数）并进行累加，最后除以贴子总数）。然后再利用这30个词的
+权重，来计算各个content的权重（不包含在这30词里面的单词权重视为0，可以通过修改valid_word_num大小来改变有效单词的数目），由此完成content的量化
+
+其他文件(使用20个单词构建的中间文件已全部删除)：
+word_dict20/30.npy：中间文件，不用管
+word_weight_dict20/30.npy:权重最高的20/30个单词对应的字典，可以通过np.load('文件名').item()的形式获得
+data_test20/30.csv：使用权重最高的20/30个单词对测试集content进行量化得到的表格
+data_train_1/2_20/30.csv：使用权重最高的20/30个单词对测试集content进行量化得到的表格（因为数据量过大，需要两个csv来储存）
+dataset:数据集文件夹
+dataset/dataset_2_8_30:数据集文件夹，文件夹名字格式为dataset_(start_month)_(end_month)_(valid_word_num)，其中的内容为process_data函数的返回值中的训练集和验证集，当end_month=8时，验证集为空，其中data_all_train.npy的格式和process_data返回的训练集相同
+
+
+其余部分见代码注释
