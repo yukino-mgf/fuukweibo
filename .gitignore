@@ -1,2 +1,6 @@
+uid_features_str.txt
+same_uid_lists.json
+.vscode
 data/weibo_*
+*.pyc 
 __pycache__/

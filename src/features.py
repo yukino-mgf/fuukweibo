@@ -1,5 +1,9 @@
 
 import math
+import json
+import jieba
+# import simhash
+
 delimiter = "\t"
 
 def uid_features(same_uid_train_file_path,uid_features_file_path):
@@ -84,7 +88,18 @@ def median(lst):
     else:
         return  int((lst[len(lst)//2-1]+lst[len(lst)//2])/2)
 
-
-
-
-    
+def same_uid_process(same_uid_train_file_path, same_uid_file_path):
+    res_dic = {}
+    with open(same_uid_train_file_path, 'r', encoding='utf-8') as fin:
+        lines = fin.readlines()
+        for line in lines:
+            train_uid, train_mid, train_time, train_forward_count, train_comment_count, train_like_count, train_content = line.split(delimiter)
+            if train_uid not in res_dic:
+                res_dic[train_uid] = []
+            # train_content_set = set(list(train_content))
+            # train_content_list = list(train_content_set)
+            train_cut = jieba.lcut(train_content)
+            line_tuple = (train_forward_count, train_comment_count, train_like_count, train_cut)
+            res_dic[train_uid].append(line_tuple)
+    with open(same_uid_file_path, 'w', encoding='utf-8') as fout:
+        json.dump(res_dic, fout, ensure_ascii=False)
