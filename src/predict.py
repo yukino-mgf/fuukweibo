@@ -13,6 +13,9 @@ def weibo_predict(uid_features_str_file_path, weibo_predict_file_path,weibo_resu
         uid=line.split(delimiter)[0]
         mid=line.split(delimiter)[1]
         if uid in table.keys():
-            weibo_result_file.write(uid+"\t"+mid+"\t"+table[""+uid+""])
+            if table[""+uid+""] == "0,0,0":
+                weibo_result_file.write(uid+"\t"+mid+"\t"+str(5)+ ","+str(3)+ ","+str(3)+ "\n")
+            else:
+                weibo_result_file.write(uid+"\t"+mid+"\t"+table[""+uid+""])
         else:
-            weibo_result_file.write(uid+"\t"+mid+"\t"+str(0)+ ","+str(0)+ ","+str(0)+ "\n")
+            weibo_result_file.write(uid+"\t"+mid+"\t"+str(5)+ ","+str(3)+ ","+str(3)+ "\n")

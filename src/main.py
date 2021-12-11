@@ -33,8 +33,10 @@ weibo_predict_sort_path = "weibo_predict_data_sort.txt"
 weibo_train_five_file_path = "weibo_train_five.txt"
 weibo_train_last_file_path = "weibo_train_last.txt"
 uid_features_str_file_path="uid_features_str.txt"
-weibo_result_file_path="weibo_result.txt"
+weibo_result_file_path="weibo_train_result.txt"
 
+#
+weibo_pred_result_path = "weibo_predict_result.txt"
 
 starttime = datetime.now()
 generate_sortedfile(weibo_train_file_path,weibo_train_sort_path)
@@ -48,6 +50,8 @@ print ("4.User feature extraction has been completed")
 weibo_predict(uid_features_str_file_path, weibo_train_last_file_path,weibo_result_file_path)
 print ("5.Forecast has been completed")
 score=score(weibo_result_file_path,weibo_train_last_file_path)
-print ("6.The whole score is "+score)
+print ("6.The whole offline score is "+score)
+##预测
+weibo_predict(uid_features_str_file_path, weibo_predict_sort_path,weibo_pred_result_path)
 endtime = datetime.now()
 print ("Total running time: %f s" % (endtime - starttime).seconds)
